@@ -16,24 +16,24 @@ def configure_firewall(config):
     table = iptc.Table(iptc.Table.FILTER)
     table.flush()  # Очистить существующие правила
 
-    print(table)
+    # Создание цепочки INPUT, если ее не существует
+    chain = None
+    try:
+        chain = iptc.Chain(table, "INPUT")
+    except iptc.ChainError:
+        chain = table.create_chain("INPUT")
 
-    # # Создание цепочки INPUT, если ее не существует
-    # chain = None
-    # try:
-    #     chain = iptc.Chain(table, "INPUT")
-    # except iptc.ChainError:
-    #     chain = table.create_chain("INPUT")
+    # Политика по умолчанию: DROP для всего входящего трафика
+    chain.set_policy("DROP") # Policy needs to be a string.
 
-    # # Политика по умолчанию: DROP для всего входящего трафика
-    # chain.set_policy("DROP") # Policy needs to be a string.
+    # Разрешить существующие соединения
+    rule = iptc.Rule()
+    match = rule.create_match("conntrack")
+    match.ctstate = "ESTABLISHED,RELATED" # Установка состояний соединения
+    # target = iptc.Target(rule, "ACCEPT")
+    # rule.target = target
 
-    # # Разрешить существующие соединения
-    # rule = iptc.Rule()
-    # rule.ctstate.add("ESTABLISHED")
-    # rule.ctstate.add("RELATED")
-    # match = rule.create_match("conntrack")
-    # chain.insert_rule(rule)
+    chain.insert_rule(rule)
 
     # # Разрешить трафик на loopback интерфейсе
     # rule = iptc.Rule()
