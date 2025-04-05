@@ -30,35 +30,39 @@ def configure_firewall(config):
     rule = iptc.Rule()
     match = rule.create_match("conntrack")
     match.ctstate = "ESTABLISHED,RELATED" # Установка состояний соединения
-    # target = iptc.Target(rule, "ACCEPT")
-    # rule.target = target
-
+    target = iptc.Target(rule, "ACCEPT")
+    rule.target = target
     chain.insert_rule(rule)
 
     # # Разрешить трафик на loopback интерфейсе
-    # rule = iptc.Rule()
-    # rule.in_interface = "lo"
-    # chain.insert_rule(rule)
+    rule = iptc.Rule()
+    rule.in_interface = "lo"
+    target = iptc.Target(rule, "ACCEPT")
+    rule.target = target
+    chain.insert_rule(rule)
 
-    # # Разрешить разрешенные порты (TCP)
-    # for port in config['allowed_ports']['tcp']:
-    #     rule = iptc.Rule()
-    #     rule.protocol = "tcp"
-    #     match = rule.create_match("tcp")
-    #     match.dport = str(port) # iptables требует строку
-    #     rule.add_match(match)
-    #     chain.insert_rule(rule)
-    #     logging.info(f"Разрешен TCP порт {port}")
+    # Разрешить разрешенные порты (TCP)
+    for port in config['allowed_ports']['tcp']:
+        
+        rule = iptc.Rule()
+        rule.protocol = "tcp"
+        match = rule.create_match("tcp")
+        match.dport = str(port) # iptables требует строку
+        rule.add_match(match)
+        target = iptc.Target(rule, "ACCEPT")
+        rule.target = target
+        chain.insert_rule(rule)
+        logging.info(f"Разрешен TCP порт {port}")
 
-    # # Разрешить разрешенные порты (UDP)
-    # for port in config['allowed_ports']['udp']:
-    #     rule = iptc.Rule()
-    #     rule.protocol = "udp"
-    #     match = rule.create_match("udp")
-    #     match.dport = str(port) # iptables требует строку
-    #     rule.add_match(match)
-    #     chain.insert_rule(rule)
-    #     logging.info(f"Разрешен UDP порт {port}")
+    # Разрешить разрешенные порты (UDP)
+    for port in config['allowed_ports']['udp']:
+        rule = iptc.Rule()
+        rule.protocol = "udp"
+        match = rule.create_match("udp")
+        match.dport = str(port) # iptables требует строку
+        rule.add_match(match)
+        chain.insert_rule(rule)
+        logging.info(f"Разрешен UDP порт {port}")
 
     logging.info("Файрвол настроен")
 

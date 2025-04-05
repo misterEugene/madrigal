@@ -1,4 +1,4 @@
 allowed_ports:
-  tcp: [80, 443, 22]
+  tcp: [80, 443]
   udp: []
 log_file: "firewall.log"
