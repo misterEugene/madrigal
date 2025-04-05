@@ -63,7 +63,7 @@ def configure_firewall(config):
         rule.add_match(match)
         chain.insert_rule(rule)
         logging.info(f"Разрешен UDP порт {port}")
-
+ 
     logging.info("Файрвол настроен")
 
 def main():
