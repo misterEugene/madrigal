@@ -32,14 +32,14 @@ def configure_firewall(config):
     match.ctstate = "ESTABLISHED,RELATED" # Установка состояний соединения
     target = iptc.Target(rule, "ACCEPT")
     rule.target = target
-    chain.insert_rule(rule)
+    chain.append_rule(rule) # Добавляем в конец
 
     # # Разрешить трафик на loopback интерфейсе
     rule = iptc.Rule()
     rule.in_interface = "lo"
     target = iptc.Target(rule, "ACCEPT")
     rule.target = target
-    chain.insert_rule(rule)
+    chain.append_rule(rule)  # Добавляем в конец
 
     # Разрешить разрешенные порты (TCP)
     for port in config['allowed_ports']['tcp']:
@@ -51,7 +51,7 @@ def configure_firewall(config):
         rule.add_match(match)
         target = iptc.Target(rule, "ACCEPT")
         rule.target = target
-        chain.insert_rule(rule)
+        chain.append_rule(rule) # Добавляем в конец
         logging.info(f"Разрешен TCP порт {port}")
 
     # Разрешить разрешенные порты (UDP)
@@ -61,7 +61,7 @@ def configure_firewall(config):
         match = rule.create_match("udp")
         match.dport = str(port) # iptables требует строку
         rule.add_match(match)
-        chain.insert_rule(rule)
+        chain.append_rule(rule) # Добавляем в конец
         logging.info(f"Разрешен UDP порт {port}")
  
     logging.info("Файрвол настроен")
